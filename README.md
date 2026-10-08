@@ -1,6 +1,21 @@
 # Peron
 
-Peron: web responsif (Nuxt 4) untuk melihat jadwal keberangkatan KRL Commuter Line Jabodetabek.
+Peron is a responsive web app (Nuxt 4) for checking departures on the KRL Commuter Line, the
+electric commuter rail network of Greater Jakarta (Jabodetabek). The interface is in Indonesian.
+
+## Features
+
+- **Departure board per station** with a live countdown, filterable by line and destination.
+  The next train is drawn as a piece of map from your station to its destination.
+- **Train detail** showing the full route as a horizontal line diagram, the stretch already
+  travelled, and where the train is now.
+- **Schematic network map** of the five KRL lines in a regional-rail-map style, including the
+  Cikarang loop via Kampung Bandan and Pasar Senen. Station names link to their boards.
+- **Line pages** with horizontal line diagrams, transfer tags and short-turn stations.
+- **Favourite stations**, marked with a star everywhere a station appears (stored in the browser).
+- **Light, dark and system themes**, applied before first paint so there is no flash.
+
+## Getting started
 
 ```bash
 npm install
@@ -8,39 +23,47 @@ npm run dev        # http://localhost:3000
 npm run build && node .output/server/index.mjs
 ```
 
-## Sumber data
+## Data source
 
-Server memanggil **API partner KRL** bila dua env ini diisi (lihat `.env.example`):
+The server calls the **KRL partner API** when both of these environment variables are set
+(see `.env.example`):
 
 ```bash
-NUXT_KRL_API_BASE=https://<host-partner>/<prefix-versi>   # dari dokumentasi partner
-NUXT_KRL_API_TOKEN=<token partner>                        # dikirim sebagai Bearer
+NUXT_KRL_API_BASE=https://<partner-host>/<version-prefix>   # from the partner documentation
+NUXT_KRL_API_TOKEN=<partner token>                          # sent as a Bearer token
 ```
 
-Path endpoint (`/schedule`, `/schedule-train`) ada di `PATHS` pada `server/utils/krlApi.ts`.
-Format respons mengikuti `www.kci.id/api/krl/*` (`sta_id`, `train_id`, `time_est`, `dest_time`, …).
-Bila env kosong, app memakai **jadwal simulasi** dan menampilkan label "Jadwal simulasi".
-Bila env diisi tapi API gagal, app menampilkan error (tidak diam-diam jatuh ke simulasi).
+- Endpoint paths (`/schedule`, `/schedule-train`) live in `PATHS` in `server/utils/krlApi.ts`.
+- Responses are expected in the same shape as `www.kci.id/api/krl/*`
+  (`sta_id`, `train_id`, `time_est`, `dest_time`, …).
+- With the variables unset, the app uses a **simulated timetable** and labels every page that
+  shows it as "Jadwal simulasi" (simulated schedule).
+- With the variables set but the API failing, the app shows an error instead of silently falling
+  back to simulated data.
 
-Catatan: endpoint publik `www.kci.id/api/krl/*` tidak bisa dipakai dari server/aplikasi lain —
-diblokir Cloudflare (403) dan tidak mengirim header CORS.
+Note: the public `www.kci.id/api/krl/*` endpoints can't be used from another server or site. They
+sit behind Cloudflare bot protection (HTTP 403) and send no CORS headers.
 
-## Struktur
+## Project structure
 
-| Path | Isi |
+| Path | Contents |
 | --- | --- |
-| `shared/stations.ts` | Katalog stasiun KCI (kode `sta_id` → nama), dari endpoint stasiun |
-| `shared/krl.ts` | Data jalur, tipe data, pencocokan nama API, helper waktu WIB |
-| `server/utils/krlApi.ts` | Klien API partner (+ cache 60 dtk / 5 mnt) |
-| `server/utils/schedule.ts` | Jadwal simulasi (fallback saat API tidak dikonfigurasi) |
-| `server/api/stations/[id]/departures.get.ts` | Keberangkatan dari satu stasiun |
-| `server/api/trains/[id].get.ts` | Perjalanan satu kereta (urutan stasiun) |
-| `app/pages/` | Beranda, `/stasiun/:kode`, `/kereta/:id`, `/jalur`, `/jalur/:id` |
+| `shared/stations.ts` | KCI station catalogue (`sta_id` code → name) |
+| `shared/krl.ts` | Line data (including branches such as the Cikarang loop), types, API name matching, WIB time helpers |
+| `server/utils/krlApi.ts` | Partner API client, with caching (60 s schedules, 5 min trains) |
+| `server/utils/schedule.ts` | Simulated timetable, used when the API isn't configured |
+| `server/api/stations/[id]/departures.get.ts` | Departures from one station |
+| `server/api/trains/[id].get.ts` | One train's journey (stops and times) |
+| `app/components/KrlMap.vue` | Schematic network map on the home page |
+| `app/components/LineTrack.vue` | Horizontal line diagram used on line and train pages |
+| `app/pages/` | Home, `/stasiun/:code`, `/kereta/:id`, `/jalur`, `/jalur/:id` |
 
-## Ide lanjutan
+## Ideas for later
 
-- Info gangguan/keterlambatan dari API
-- Perencana rute A → B dengan transit (Manggarai, Tanah Abang, Duri, Jakarta Kota)
-- PWA: offline, "tambah ke layar utama", notifikasi "kereta 5 menit lagi"
-- Perkiraan kepadatan per jam, fasilitas stasiun, stasiun terdekat via geolokasi
-- Tarif perjalanan, integrasi MRT/LRT/TransJakarta
+- Disruption and delay notices from the API
+- Journey planner from A to B with transfers (Manggarai, Tanah Abang, Duri, Jakarta Kota)
+- PWA: offline support, install to home screen, "train in 5 minutes" notifications
+- Crowding estimates by hour, station facilities, nearest station via geolocation
+- Fares, and connections to MRT, LRT and TransJakarta
+
+Peron is not affiliated with PT Kereta Commuter Indonesia (KAI Commuter).
