@@ -1,0 +1,171 @@
+/*
+ * Theme: transit map. White ground, thick rounded lines in the KRL line colours,
+ * line codes on small coloured tags, rivers in pale blue and region borders in
+ * pale sand as quiet background geography. One typeface: Jost (geometric).
+ */
+:root {
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f3f6f9;
+  --text: #1d2228;
+  --muted: #5e6772;
+  --border: #e6eaee;
+  --river: #ddf0fb;
+  --river-text: #7fc0e6;
+  --land: #e8dcbc;
+  --land-text: #c4ad78;
+  --tag: #d3d7dc;       /* neutral tag, like the grey lines on the map */
+  --tag-text: #1d2228;
+  --focus: #0a84d0;
+  --soon: #c2410c;
+  --soon-bg: #fff1e8;
+  --fav: #e8a317;       /* favourite-station star */
+  --line-w: 10px;       /* stroke width of a drawn line */
+  color-scheme: light;
+}
+
+/* Dark: follows the device unless the reader picked light; or forced with data-theme="dark". */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #12161b;
+    --surface: #181d23;
+    --surface-2: #1f252c;
+    --text: #e7ebf0;
+    --muted: #9aa3ae;
+    --border: #262d35;
+    --river: #17303f;
+    --river-text: #4f87ab;
+    --land: #3f3828;
+    --land-text: #8c7a55;
+    --tag: #39414b;
+    --tag-text: #e7ebf0;
+    --focus: #5cb6f0;
+    --soon: #ffa866;
+    --soon-bg: rgb(255 168 102 / 0.12);
+    --fav: #ffc24d;
+    color-scheme: dark;
+  }
+}
+:root[data-theme='dark'] {
+  --bg: #12161b;
+  --surface: #181d23;
+  --surface-2: #1f252c;
+  --text: #e7ebf0;
+  --muted: #9aa3ae;
+  --border: #262d35;
+  --river: #17303f;
+  --river-text: #4f87ab;
+  --land: #3f3828;
+  --land-text: #8c7a55;
+  --tag: #39414b;
+  --tag-text: #e7ebf0;
+  --focus: #5cb6f0;
+  --soon: #ffa866;
+  --soon-bg: rgb(255 168 102 / 0.12);
+  --fav: #ffc24d;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Jost', system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; }
+
+/* Type scale, ratio 1.25 */
+h1, h2, h3 { line-height: 1.1; letter-spacing: -0.01em; }
+h1 { font-size: clamp(2.2rem, 6vw, 3.05rem); font-weight: 600; }
+h2 { font-size: 1.25rem; font-weight: 600; margin: 0 0 1rem; }
+
+.num { font-variant-numeric: tabular-nums lining-nums; }
+.muted { color: var(--muted); }
+
+.shell { min-height: 100dvh; display: flex; flex-direction: column; overflow-x: clip; }
+.container { width: 100%; max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+.main { flex: 1; padding-top: 1.75rem; padding-bottom: 3.5rem; }
+.footer {
+  padding-top: 1.25rem;
+  padding-bottom: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.section { margin-top: 3rem; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+/* Region name, as printed on the map: spaced capitals in pale sand. Decorative only. */
+.region { font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--land-text); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 40px;
+  padding: 0 1rem;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn:hover { border-color: var(--text); }
+
+.chips { display: flex; gap: 0.4rem; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 36px;
+  padding: 0 0.85rem;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.chip:hover { background: var(--border); }
+.chip[aria-pressed='true'] { color: var(--bg); background: var(--text); }
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.9375rem;
+  color: var(--muted);
+  text-decoration: none;
+}
+.back:hover { color: var(--text); text-decoration: underline; }
+
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
